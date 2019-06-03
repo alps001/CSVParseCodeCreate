@@ -1,5 +1,5 @@
 ID,name,time,type,price,color
-,,,,,
+Int,String,Int,Int,Int,Color
 1,Skip 1 hour,1,1,0,#000000
 5,Cost 50% off,60,2,0,#FFFFFF
 2,Skip 1 day,24,1,25,#000000

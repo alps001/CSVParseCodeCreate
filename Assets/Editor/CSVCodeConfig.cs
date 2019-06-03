@@ -49,7 +49,12 @@ private void {0}()
 		{4} temp = new {5}();
 		foreach (string header in csvTable.Headers)
 		{{
-			{6}
+                try{{
+			        {6}
+                }}catch(Exception e)
+                {{
+                    Debug.LogError(""第"" + csvTable.Records.IndexOf(record) + ""行"" + csvTable.Headers.IndexOf(header) + ""列解析报错，列名："" + header + "" 数据："" + record.GetField(header));
+                }}
 		}}
 		{7}.Add(temp);
 	}}

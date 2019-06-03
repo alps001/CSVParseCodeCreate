@@ -7,6 +7,8 @@ using System.IO;
 using UnityEditor.IMGUI.Controls;
 using Rotorz.ReorderableList;
 using System.Text;
+using System;
+
 public class CreateCSVParseCode : EditorWindow 
 {
 	#region Const
@@ -14,21 +16,6 @@ public class CreateCSVParseCode : EditorWindow
 	private const string DEFAULT_CSV_PATH = "CsvData\\";
 
 	#endregion
-
-	private CSVLoader csvLoader;
-
-	private CSVLoader CsvLoader
-	{
-		get
-		{
-			if (csvLoader == null)
-			{
-				csvLoader = new CSVLoader();
-			}
-			return csvLoader;
-		}
-	}
-	
 	
 	private static CreateCSVParseCode window = null;
 
@@ -276,18 +263,23 @@ public class CreateCSVParseCode : EditorWindow
 	{
 		//string path = DEFAULT_CSV_PATH + "guide";
 		string csvpath = DEFAULT_CSV_PATH + GetFilePath(path);
-		CSVTable csvTable = CsvLoader.LoadCSV(csvpath);
+		CSVTable csvTable = CSVLoader.LoadCSV(csvpath);
 		data.Clear();
 		if(csvTable != null)
 		{
-			foreach (string _header in csvTable.Headers)
-			{
-				if(!string.IsNullOrEmpty(_header))
-				{
-					DataType _dataType = GetDataTypeByHeader(csvTable,_header);
-					data.Add(new CsvData(){header = _header,dataType = _dataType});
-				}
-			}
+            for (int i = 0; i < csvTable.Headers.Count; i++) {
+                if (!string.IsNullOrEmpty(csvTable.Headers[i]))
+                {
+                    try
+                    {
+                        data.Add(new CsvData() { header = csvTable.Headers[i], dataType = (DataType)Enum.Parse(typeof(DataType), csvTable.DataTypes[i]) });
+                    }
+                    catch (Exception e) {
+                        Debug.LogError("检查第二行的数据类型是否书写正确，参见：枚举DataType");
+                    }
+                    
+                }
+            }
 		}
 	}
 
@@ -428,8 +420,7 @@ public class CreateCSVParseCode : EditorWindow
 	private DataType GetDataTypeByHeader(CSVTable table,string header)
 	{
 		if(table == null) return DataType.String;
-		
-		foreach (CSVRecord record in table.Records)
+        foreach (CSVRecord record in table.Records)
 		{
 			foreach (string _header in table.Headers)
 			{
@@ -504,13 +495,13 @@ public class CreateCSVParseCode : EditorWindow
 
 public enum DataType
 {
-	Int = 0,
-	String = 1,
-	Double = 2,
-	Bool = 3,
-	//Vector3 = 4,
-	//Vector2 = 5,
-	Color = 6,
+	Int,
+	String,
+	Double,
+	Bool,
+	//Vector3,
+	//Vector2,
+	Color,
 }
 
 public class CsvData
